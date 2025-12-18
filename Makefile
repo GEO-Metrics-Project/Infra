@@ -1,4 +1,4 @@
-.PHONY: infra-namespace metallb ingress all
+.PHONY: infra-namespace metallb all
 
 SCRIPT_DIR=$(shell cd scripts/setup && pwd)
 SETUP_SCRIPT=$(SCRIPT_DIR)/setup-infra.sh
@@ -9,7 +9,4 @@ infra-namespace:
 metallb:
 	bash $(SETUP_SCRIPT) setup_metallb
 
-ingress:
-	bash $(SETUP_SCRIPT) deploy_ingress
-
-all: infra-namespace helm-repos ingress
+all: infra-namespace helm-repos
