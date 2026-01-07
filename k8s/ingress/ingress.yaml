@@ -36,9 +36,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: oathkeeper
+                name: oathkeeper-proxy
                 port:
-                  number: 80
+                  number: 4455
   tls:
     - hosts:
         - auth.combaldieu.fr
