@@ -24,7 +24,6 @@ tasks:
       - helm repo update
       - helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx
           -n {{.NGINX_NAMESPACE}}
-          --create-namespace
           --set controller.admissionWebhooks.enabled=false
           --wait --timeout 300s
 
@@ -35,7 +34,6 @@ tasks:
       - helm repo update
       - helm upgrade --install cert-manager jetstack/cert-manager
           -n {{.CERT_MANAGER_NAMESPACE}}
-          --create-namespace
           --set installCRDs=true
           --wait --timeout 300s
 
