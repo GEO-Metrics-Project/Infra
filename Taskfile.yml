@@ -1,0 +1,49 @@
+version: '3'
+
+vars:
+  METALLB_NAMESPACE: metallb-system
+  NGINX_NAMESPACE: geo-infra
+  CERT_MANAGER_NAMESPACE: cert-manager
+
+tasks:
+  setup:metallb:
+    desc: Install and configure MetalLB
+    cmds:
+      - helm repo add metallb https://metallb.github.io/metallb
+      - helm repo update
+      - helm upgrade --install metallb metallb/metallb
+          -n {{.METALLB_NAMESPACE}}
+          --create-namespace
+          --wait --timeout 300s
+      - kubectl apply -f k8s/metallb/metallb.yaml
+
+  setup:nginx:
+    desc: Install and configure ingress-nginx
+    cmds:
+      - helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+      - helm repo update
+      - helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx
+          -n {{.NGINX_NAMESPACE}}
+          --create-namespace
+          --set controller.admissionWebhooks.enabled=false
+          --wait --timeout 300s
+
+  setup:cert-manager:
+    desc: Install and configure cert-manager
+    cmds:
+      - helm repo add jetstack https://charts.jetstack.io
+      - helm repo update
+      - helm upgrade --install cert-manager jetstack/cert-manager
+          -n {{.CERT_MANAGER_NAMESPACE}}
+          --create-namespace
+          --set installCRDs=true
+          --wait --timeout 300s
+
+  setup:letsencrypt-issuer:
+    desc: Apply the Let's Encrypt ClusterIssuer
+    cmds:
+      - kubectl apply -f k8s/cert-manager/letsencrypt-issuer.yaml
+
+  setup:infra:
+    desc: Install core infra services
+    deps: [setup:metallb, setup:nginx, setup:cert-manager, setup:letsencrypt-issuer]
